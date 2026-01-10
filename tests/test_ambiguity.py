@@ -245,37 +245,36 @@ def test_interpretation_rejects_duplicate_assumptions():
     assert empty.assumptions == []
 
 
-def test_resolve_ambiguity_refuses_duplicate_assumptions_in_interpretation():
+def test_proposer_recorded_validates_duplicate_assumptions():
     """
-    resolve_ambiguity refuses interpretations with duplicate assumptions.
+    RecordedProposer validates interpretations have no duplicate assumptions.
     
-    If a proposer returns interpretations with duplicate assumptions, the kernel
-    should refuse (raise ValueError) rather than process invalid input.
+    When RecordedProposer creates Interpretation objects from recorded data,
+    the Interpretation.__post_init__ validation will reject duplicates.
+    This ensures the invariant is enforced even when loading from fixtures.
     """
-    # This should fail at Interpretation construction time in the proposer
-    # But we test that resolve_ambiguity propagates the error correctly
-    from motherlabs_kernel.ambiguity import resolve_ambiguity
-    from motherlabs_kernel.policy_types import Policy
+    from motherlabs_kernel.proposer_recorded import RecordedProposer
     
-    # Create a proposer that would return invalid interpretation
-    # But since Interpretation.__post_init__ validates, this will fail at construction
-    # So we test that the validation happens
+    # Valid: no duplicates
+    valid_recordings = {
+        "interpretations:test_hash:2": [
+            {"name": "A", "assumptions": ["a", "b"], "intent_summary": "summary1"},
+            {"name": "B", "assumptions": ["c"], "intent_summary": "summary2"},
+        ]
+    }
+    proposer = RecordedProposer(valid_recordings)
+    proposal = proposer.propose_interpretations("test_hash", 2)
+    assert len(proposal.value) == 2
+    assert all(len(interp.assumptions) == len(set(interp.assumptions)) for interp in proposal.value)
     
-    policy = Policy(
-        max_interpretations=2,
-        max_nodes=100,
-        max_depth=10,
-        contradiction_budget=5,
-        max_steps=50
-    )
+    # Invalid: duplicate assumptions in one interpretation
+    invalid_recordings = {
+        "interpretations:test_hash2:1": [
+            {"name": "Invalid", "assumptions": ["duplicate", "duplicate"], "intent_summary": "summary"},
+        ]
+    }
+    proposer_invalid = RecordedProposer(invalid_recordings)
     
-    # Attempt to create invalid interpretation (should raise ValueError)
+    # Should raise ValueError when creating Interpretation (at __post_init__)
     with pytest.raises(ValueError, match="duplicate assumptions"):
-        invalid_interp = Interpretation(
-            name="Invalid",
-            assumptions=["duplicate", "duplicate"],
-            intent_summary="Invalid"
-        )
-        # If we get here, validation failed
-        proposer = FixedProposer([invalid_interp])
-        resolve_ambiguity("run1", "seed_hash_123", policy, proposer)
+        proposer_invalid.propose_interpretations("test_hash2", 1)
