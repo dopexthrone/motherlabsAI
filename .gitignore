@@ -45,7 +45,6 @@ inspect_business*.py
 
 # Temporary status/process docs (historical, not part of contract)
 ACTUAL_STATUS.md
-FINAL_STATUS.md
 COMMIT_PLAN.md
 COMMIT_SUMMARY.md
 COMMIT_PLAN_FIXES.md
