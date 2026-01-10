@@ -11,16 +11,39 @@ The kernel implements **Path B (conservatism-first)** ambiguity resolution. This
 
 - **Formula**: `cost = base + penalty`
   - `base = len(intent_summary) + 10 * len(assumptions)`
-  - `penalty = 5 * (duplicate_occurrences - 1)` for each assumption that appears in multiple interpretations
+    - `len(intent_summary)` is Python string length in **characters** (not tokens, not bytes)
+    - `len(assumptions)` is the count of assumption strings in the list
+  - `penalty`: For each assumption in the interpretation, if it appears in multiple interpretations (across all interpretations), add `5 * (occurrence_count - 1)` where `occurrence_count` is the total number of times that exact assumption string appears across all interpretations
+    - If an interpretation has multiple assumptions that are duplicated, it pays multiple penalties (one per duplicated assumption)
+    - Penalty is accumulated per assumption in the interpretation being scored
 - **Sort Direction**: **Ascending** (lower cost wins, fewer assumptions preferred)
 - **Semantics**:
   - Fewer assumptions → lower base → lower cost → **preferred** ✅
   - Duplicates → higher penalty → higher cost → **less preferred** ✅
   - Shorter summaries → lower base → lower cost → **preferred** ✅
 
-### Golden Invariant
+**Measurement Units (v0.1.0)**:
+- `len(intent_summary)` is Python string length in characters (Python `len(str)`)
+- Duplicate assumptions are detected by **exact string equality (`==`)** across interpretations
+- **No normalization is applied in v0.1.0** (case-sensitive, whitespace-sensitive)
+- If normalization (trim/lower/collapse whitespace) is introduced, that is a **breaking change** unless explicitly excluded from hashing/outcomes
+
+**Assumption List Invariant**:
+- Within a single interpretation, `assumptions` must not contain duplicate strings
+- Violation is invalid input (should trigger refusal or validation error)
+- If an interpretation's assumptions list contains the same string twice, behavior is undefined in v0.1.0
+
+### Golden Invariant (Mechanically Testable)
 
 **SimpleCalc** (less assumptive) must always win over **AdvancedCalc** (more assumptive) for the golden fixture seed, without regenerating fixtures. This locks the "refusal over guessing" philosophy.
+
+**Mechanical Requirements**:
+- The golden test (`tests/test_golden_run.py`) is a **required status check** on `main` branch and must never be skipped
+- The golden test must run and pass on every push and pull request (enforced by CI)
+- Any PR that changes the winner for the golden fixture is a **breaking change** and must:
+  - Bump version (semantic versioning)
+  - Intentionally regenerate goldens (documented in CHANGELOG)
+  - Update this document with formal justification
 
 ### Required Behavior
 
@@ -95,6 +118,11 @@ Kernel must refuse (not guess) when:
 - Verification cannot prove invariants
 
 Refusal is an **expected output mode**, not a failure.
+
+**Clarification: "Autonomous" vs "Refusal"**:
+- "Autonomous" refers to not requiring human selection among interpretations during a run
+- The kernel can autonomously refuse when it cannot safely converge
+- "Autonomous" does not mean "always returns a blueprint" - it means "makes all decisions (accept/reject/refuse) without human input"
 
 ## Change Control
 

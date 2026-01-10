@@ -18,9 +18,10 @@ The `main` branch must be protected to prevent silent invariant violations.
    - ✅ Required: Yes
    - ✅ Require branches to be up to date before merging: Yes
    - ✅ Status checks required:
-     - `test / test (3.11)` (must pass)
-     - `test / test (3.12)` (must pass)
+     - `tests (py3.11)` (must pass)
+     - `tests (py3.12)` (must pass)
      - Both test jobs must pass (golden test is included in each)
+   - **Note**: These job names are defined in `.github/workflows/test.yml` with `name: tests (py${{ matrix.python-version }})`. If the workflow is updated, these names must be updated here as well.
 
 3. **Require conversation resolution before merging**
    - ✅ Required: Yes (prevents merging with unresolved review comments)
@@ -83,7 +84,7 @@ gh auth login
 # Set branch protection rules
 gh api repos/dopexthrone/motherlabsAI/branches/main/protection \
   --method PUT \
-  --field required_status_checks='{"strict":true,"contexts":["test / test (3.11)","test / test (3.12)"]}' \
+  --field required_status_checks='{"strict":true,"contexts":["tests (py3.11)","tests (py3.12)"]}' \
   --field enforce_admins=true \
   --field required_pull_request_reviews='{"required_approving_review_count":0,"dismiss_stale_reviews":true}' \
   --field restrictions=null \

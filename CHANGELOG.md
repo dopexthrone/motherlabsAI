@@ -5,7 +5,7 @@ All notable changes to the Motherlabs Kernel will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2024 - FROZEN
+## [0.1.0] - 2026-01-09 - FROZEN
 
 ### Added - Initial Release
 
@@ -42,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Deterministic scoring (base + duplicate penalty)
   - Pruning (top K with tie-breaking)
   - Collapse to winner
-  - Fully autonomous (no human-in-the-loop)
+  - Fully autonomous (no human selection required during run; kernel can autonomously refuse)
 
 - **Engine Run** (`run_engine.py`, `replay.py`)
   - `run_engine()` - Complete engine run: seed → ledger → DAG → artifacts
