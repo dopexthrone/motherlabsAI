@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Old/Trial Code (out of scope for kernel)
+trial_backup/
+motherlabs_genesis/
+motherlabs_genesis_bundle*.json
+motherlabs_v0_prototype/
+src/core/
+src/data/
+src/interface/
+dag_engine.py
+inspect_business*.py
+*__init__-1.py
+*blueprint-1.py
+*model-1.py
+*cli-1.py
+*main-1.py
+*explorer-1.py
+*builder-1.py
+*entropy-1.py
+*llm_engine-1.py
+*selector-1.py
+*verifier-1.py
+
+# Temporary status/process docs (historical, not part of contract)
+ACTUAL_STATUS.md
+FINAL_STATUS.md
+COMMIT_PLAN.md
+COMMIT_SUMMARY.md
+COMMIT_PLAN_FIXES.md
+FINAL_COMMIT_PLAN.md
+ISSUES_TO_FIX.md
+REFACTOR_*.md
+TEST_FIXES_APPLIED.md
+TEST_RUN_INSTRUCTIONS.md
+TEST_STATUS.md
+VERIFICATION_COMPLETE.md
+VERIFICATION_REPORT.md
+FINAL_VERIFICATION_SUMMARY.md
+
+# Setup guides (one-time, keep locally but not in repo)
+GITHUB_AUTH.md
+GITHUB_SETUP.md
