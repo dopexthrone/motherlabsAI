@@ -1,0 +1,21 @@
+{
+  "interpretations:c5d6b0c473582da7ec01ada097cceeb0da22ec92d9227d7dd7cfa92e0761a182:2": [
+    {
+      "name": "SimpleCalc",
+      "assumptions": [
+        "arithmetic",
+        "basic_ops"
+      ],
+      "intent_summary": "A simple calculator with addition, subtraction, multiplication, and division"
+    },
+    {
+      "name": "AdvancedCalc",
+      "assumptions": [
+        "arithmetic",
+        "scientific",
+        "memory"
+      ],
+      "intent_summary": "An advanced calculator with scientific functions and memory storage"
+    }
+  ]
+}
