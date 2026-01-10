@@ -1,0 +1,7 @@
+{
+  "max_interpretations": 2,
+  "max_nodes": 50,
+  "max_depth": 10,
+  "contradiction_budget": 5,
+  "max_steps": 50
+}

@@ -1,0 +1,14 @@
+{
+  "expected_summary_hash": "",
+  "expected_artifact_hashes": {
+    "blueprint": ""
+  },
+  "expected_dag_root_hash": "",
+  "expected_ledger_last_hash": "",
+  "expected_structure": {
+    "chosen_interpretation_name": "SimpleCalc",
+    "node_count": 4,
+    "edge_count": 3,
+    "node_kinds": ["seed", "interpretation", "assumption", "assumption"]
+  }
+}
