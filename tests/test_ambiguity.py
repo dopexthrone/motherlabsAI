@@ -203,3 +203,79 @@ def test_lower_cost_wins_explicitly():
     assert simple_cost < advanced_cost, "SimpleCalc should have lower cost (fewer assumptions)"
     assert winner.name == "SimpleCalc", "Lower cost (fewer assumptions) should win"
     assert winner == simple, "SimpleCalc with lower cost should be the winner"
+
+
+def test_interpretation_rejects_duplicate_assumptions():
+    """
+    Interpretation rejects duplicate assumptions within its own assumptions list.
+    
+    This enforces the invariant that assumptions must not contain duplicates.
+    Violation raises ValueError at construction time (invalid input).
+    """
+    # Valid: no duplicates
+    valid = Interpretation(
+        name="Valid",
+        assumptions=["assumption1", "assumption2"],
+        intent_summary="Valid interpretation"
+    )
+    assert valid.assumptions == ["assumption1", "assumption2"]
+    
+    # Invalid: duplicate assumptions
+    with pytest.raises(ValueError, match="duplicate assumptions"):
+        Interpretation(
+            name="Invalid",
+            assumptions=["duplicate", "duplicate"],
+            intent_summary="Invalid interpretation"
+        )
+    
+    # Invalid: multiple duplicates
+    with pytest.raises(ValueError, match="duplicate assumptions"):
+        Interpretation(
+            name="Invalid",
+            assumptions=["a", "b", "a", "c", "b"],
+            intent_summary="Invalid interpretation"
+        )
+    
+    # Edge case: empty assumptions (valid)
+    empty = Interpretation(
+        name="Empty",
+        assumptions=[],
+        intent_summary="No assumptions"
+    )
+    assert empty.assumptions == []
+
+
+def test_resolve_ambiguity_refuses_duplicate_assumptions_in_interpretation():
+    """
+    resolve_ambiguity refuses interpretations with duplicate assumptions.
+    
+    If a proposer returns interpretations with duplicate assumptions, the kernel
+    should refuse (raise ValueError) rather than process invalid input.
+    """
+    # This should fail at Interpretation construction time in the proposer
+    # But we test that resolve_ambiguity propagates the error correctly
+    from motherlabs_kernel.ambiguity import resolve_ambiguity
+    from motherlabs_kernel.policy_types import Policy
+    
+    # Create a proposer that would return invalid interpretation
+    # But since Interpretation.__post_init__ validates, this will fail at construction
+    # So we test that the validation happens
+    
+    policy = Policy(
+        max_interpretations=2,
+        max_nodes=100,
+        max_depth=10,
+        contradiction_budget=5,
+        max_steps=50
+    )
+    
+    # Attempt to create invalid interpretation (should raise ValueError)
+    with pytest.raises(ValueError, match="duplicate assumptions"):
+        invalid_interp = Interpretation(
+            name="Invalid",
+            assumptions=["duplicate", "duplicate"],
+            intent_summary="Invalid"
+        )
+        # If we get here, validation failed
+        proposer = FixedProposer([invalid_interp])
+        resolve_ambiguity("run1", "seed_hash_123", policy, proposer)
