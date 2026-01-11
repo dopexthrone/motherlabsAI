@@ -17,6 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Canary - Job name contract (must match branch protection)
+      run: |
+        echo "Job name: tests (py${{ matrix.python-version }})"
+        echo "This name must match branch protection required status checks."
+        echo "If this name changes, update branch protection settings accordingly."
+    
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
